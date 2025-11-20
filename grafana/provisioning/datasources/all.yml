@@ -1,4 +1,5 @@
 datasources:
+-  access: 'proxy'
    editable: true
    is_default: true
    name: 'prometheus'
