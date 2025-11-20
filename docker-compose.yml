@@ -13,9 +13,9 @@ services:
     ports:
       - "9090:9090"
 
-  grafana:
+  grafana_1:
     build: grafana
-    container_name: grafana
+    container_name: grafana_1
     environment:
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: '/var/lib/grafana/dashboards/dashboard.json'
     ports:
