@@ -5,17 +5,17 @@ services:
     ports:
       - "8080:8080"
 
-  prometheus_1:
+  prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus_1
+    container_name: prometheus
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
 
-  grafana_1:
+  grafana:
     build: grafana
-    container_name: grafana_1
+    container_name: grafana
     environment:
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: '/var/lib/grafana/dashboards/dashboard.json'
     ports:
