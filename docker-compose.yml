@@ -1,0 +1,23 @@
+services:
+  fastapi:
+    build: .
+    container_name: api
+    ports:
+      - "8080:8080"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    build: grafana
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: '/var/lib/grafana/dashboards/dashboard.json'
+    ports:
+      - "3000:3000"
