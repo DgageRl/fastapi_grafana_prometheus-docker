@@ -5,9 +5,9 @@ services:
     ports:
       - "8080:8080"
 
-  prometheus:
+  prometheus_1:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: prometheus_1
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
