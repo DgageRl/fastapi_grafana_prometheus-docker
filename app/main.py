@@ -16,7 +16,7 @@ ACTIVE_REQUESTS = Gauge("active_requests", "Active requests in system")
 
 
 @app.middleware("http")
-async def metrics_middleware(request: Request, call_next):
+async def metrics_middleware(request, call_next):
     start = time.time()
     ACTIVE_REQUESTS.inc()
     method = request.method
@@ -26,24 +26,14 @@ async def metrics_middleware(request: Request, call_next):
         response = await call_next(request)
         status_code = response.status_code
 
-        # Логируем успешные запросы
+        # Логируем все запросы
         REQUEST_COUNT.labels(method=method, endpoint=endpoint, status_code=str(status_code)).inc()
 
-    except HTTPException as http_exc:
-        # Перехватываем HTTPException (400, 500 ошибки)
-        status_code = http_exc.status_code
-        ERROR_COUNT.labels(endpoint=endpoint, status_code=str(status_code)).inc()
-        REQUEST_COUNT.labels(method=method, endpoint=endpoint, status_code=str(status_code)).inc()
-        raise
-
-    except Exception as e:
-        # Перехватываем все остальные исключения
-        ERROR_COUNT.labels(endpoint=endpoint, status_code="500").inc()
-        REQUEST_COUNT.labels(method=method, endpoint=endpoint, status_code="500").inc()
-        raise
+        # Логируем ошибки
+        if status_code >= 400:
+            ERROR_COUNT.labels(endpoint=endpoint, status_code=str(status_code)).inc()
 
     finally:
-        # Всегда обновляем метрики латенси и активных запросов
         REQUEST_LATENCY.labels(endpoint=endpoint).observe(time.time() - start)
         ACTIVE_REQUESTS.dec()
 
