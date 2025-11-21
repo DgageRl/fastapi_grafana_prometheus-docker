@@ -207,7 +207,7 @@
             "uid": "P1809F7CD0C75ACF3"
           },
           "editorMode": "code",
-          "expr": "request_count_total",
+          "expr": "sum by (method, endpoint) (\n  rate(request_count_total[1m])\n)\n",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -273,7 +273,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unit": "req/s"
         },
         "overrides": []
       },
@@ -287,10 +288,13 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "list",
-          "placement": "right",
+          "displayMode": "table",
+          "placement": "bottom",
           "showLegend": true
         },
+        "timezone": [
+          "Europe/Moscow"
+        ],
         "tooltip": {
           "hideZeros": false,
           "mode": "single",
@@ -305,7 +309,7 @@
             "uid": "P1809F7CD0C75ACF3"
           },
           "editorMode": "code",
-          "expr": "sum(rate(error_count_total[5m]))",
+          "expr": "sum by (endpoint) (\n  rate(error_count_total[1m])\n)\n\n",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -407,7 +411,7 @@
             "uid": "P1809F7CD0C75ACF3"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(request_latency_seconds_bucket[5m])) by (le, endpoint))",
+          "expr": "histogram_quantile(\n  0.95,\n  sum by (le, endpoint) (\n    rate(request_latency_seconds_bucket[1m])\n  )\n)\n",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -473,10 +477,34 @@
                 "value": 70
               }
             ]
-          },
-          "unit": "percentunit"
+          }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "{__name__=\"active_requests\", instance=\"api:8080\", job=\"api\", service=\"api\"}"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 5,
@@ -501,24 +529,17 @@
       "pluginVersion": "12.3.0",
       "targets": [
         {
-          "expr": "rate(process_cpu_seconds_total[1m]) * 100",
-          "legendFormat": "CPU %",
-          "refId": "A"
-        },
-        {
-          "expr": "process_resident_memory_bytes / process_virtual_memory_bytes * 100",
-          "legendFormat": "Memory %",
-          "refId": "B"
-        },
-        {
-          "expr": "process_open_fds / process_max_fds * 100",
-          "legendFormat": "FD %",
-          "refId": "C"
-        },
-        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P1809F7CD0C75ACF3"
+          },
+          "editorMode": "builder",
           "expr": "active_requests",
-          "legendFormat": "Active Requests",
-          "refId": "D"
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
         }
       ],
       "title": "Saturation",
@@ -584,7 +605,7 @@
             "uid": "P1809F7CD0C75ACF3"
           },
           "editorMode": "code",
-          "expr": "sum(rate(request_count_total{endpoint=\"/400\"}[5m]))\n/\nsum(rate(request_count_total[5m]))\n",
+          "expr": "100 * sum(rate(error_count_total[1m])) \n/\nsum(rate(request_count_total[1m]))\n\n",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
