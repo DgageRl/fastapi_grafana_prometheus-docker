@@ -75,7 +75,7 @@ async def return_500_error():
         status_code=500,
         detail="Internal Server Error: a 500 error"
     )
-
+#
 
 # Добавьте эндпоинт для тестирования успешных запросов
 @app.get("/success")
